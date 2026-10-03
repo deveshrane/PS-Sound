@@ -258,9 +258,10 @@
 
   function drawSono(W, H) {
     var ctx = App.ctx;
-    var x0 = 90, scale = (W - 250) / 1.0, x1 = x0 + state.l * scale;
+    var narrow = W < 600;
+    var x0 = narrow ? 50 : 90, scale = (W - x0 - (narrow ? 110 : 160)) / 1.0, x1 = x0 + state.l * scale;
     var y = Math.max(120, H * 0.34), A = 34;
-    var pulX = W - 80;
+    var pulX = W - (narrow ? 40 : 80);
     geo = { x0: x0, x1: x1, y: y };
     // the box
     D.rect(40, y + 30, W - 140, 46, "#f3e5d4", C.woodDark, 1.5);
@@ -269,7 +270,7 @@
       ctx.beginPath();
       ctx.moveTo(bx - 10, y + 30); ctx.lineTo(bx, y); ctx.lineTo(bx + 10, y + 30); ctx.closePath();
       ctx.fillStyle = C.woodDark; ctx.fill();
-      D.label(i ? "movable bridge" : "bridge", bx, y + 90, C.note, "center", "middle", 11);
+      if (!narrow) D.label(i ? "movable bridge" : "bridge", bx, y + 90, C.note, "center", "middle", 11);
     });
     var lw = 1 + state.r * 5;
     D.line(48, y, x0, y, C.metalDark, lw);
@@ -317,7 +318,7 @@
     D.hspan(x0, x1, y + 110, "l = " + fmt(state.l * 100, 0) + " cm");
 
     // mode strengths
-    var gy = Math.max(y + 170, H * 0.6), gh = H - gy - 46, bw = Math.min(54, (W - 120) / NMODES - 12);
+    var gy = Math.max(y + 170, H * 0.6), gh = H - gy - 46, bw = Math.min(54, (W - 70) / NMODES - 12);
     if (gh > 40) {
       D.label(state.drive ? "How strongly each mode is driven by the fork" : "Modes present in the vibration", 50, gy - 12, C.mark, "left", "middle", 13);
       var F1 = f1();
@@ -325,11 +326,11 @@
         var v = state.drive ? driven(n) * state.driveAmp : state.amps.length ? Math.abs(state.amps[n - 1]) * decay(n) : 0;
         var bx = 50 + (n - 1) * (bw + 12);
         D.meter(bx, gy, bw, gh, v, "", n === 1 ? C.accent : C.teal);
-        D.label(n + (n === 1 ? " loop" : " loops"), bx + bw / 2, gy + gh + 13, C.note, "center", "middle", 11);
-        D.label(App.hz(n * F1), bx + bw / 2, gy + gh + 28, C.mark, "center", "middle", 11);
+        D.label(bw < 44 ? String(n) : n + (n === 1 ? " loop" : " loops"), bx + bw / 2, gy + gh + 13, C.note, "center", "middle", 11);
+        if (bw >= 44) D.label(App.hz(n * F1), bx + bw / 2, gy + gh + 28, C.mark, "center", "middle", 11);
       }
     }
-    if (!state.amps.length && !state.drive) D.label("Click the wire between the bridges to pluck it", (x0 + x1) / 2, y - 60, C.note, "center", "middle", 13);
+    if (!state.amps.length && !state.drive) D.label(narrow ? "Tap the wire to pluck it" : "Click the wire between the bridges to pluck it", narrow ? W / 2 : (x0 + x1) / 2, y - 60, C.note, "center", "middle", 13);
     if (state.riderOff) D.badge("Resonance! The rider is thrown off", W - 16, 16, "#dcfce7", C.green, "right");
     else D.badge("Wire drawn slowed down", W - 16, 16, null, null, "right");
   }
