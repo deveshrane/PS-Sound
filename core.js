@@ -668,6 +668,10 @@
   App.start = function () {
     fit();
     window.addEventListener("resize", fit);
+    window.addEventListener("hashchange", function () {
+      var id = location.hash.slice(1);
+      if (App.sims[id] && (!App.cur || App.cur.id !== id)) App.show(id);
+    });
     var first = location.hash.slice(1);
     App.show(App.sims[first] ? first : App.order[0]);
     if (App.reduced()) setPaused(true);
